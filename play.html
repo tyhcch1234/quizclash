@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QuizClash · 玩家</title>
+<meta name="description" content="用手機加入 QuizClash 房間搶答四選一題目。">
+<meta name="theme-color" content="#141234">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%238b5cf6'/%3E%3Cpath d='M11 10l11 6-11 6z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="player-wrap">
+
+  <header class="topbar" style="padding-bottom:10px">
+    <a class="brand" href="index.html" style="font-size:16px"><span class="mark" style="width:30px;height:30px;border-radius:10px;font-size:15px">▶</span>QuizClash</a>
+    <div class="tools">
+      <span class="status" id="status"><i></i><em>連線中</em></span>
+      <span class="pill" id="codePill">房間 —</span>
+    </div>
+  </header>
+
+  <!-- join -->
+  <section class="card player-card" id="joinView">
+    <h2>加入遊戲</h2>
+    <p class="hint">輸入你的名字，主持人才認得你。</p>
+    <form id="nameForm" autocomplete="off">
+      <label class="field">
+        <span>你的名字</span>
+        <input type="text" id="nameInput" maxlength="16" placeholder="例如：小明" required>
+      </label>
+      <button class="btn primary big" type="submit">加入房間</button>
+    </form>
+    <p class="hint" id="joinMsg">房間碼：<b id="joinCode">—</b></p>
+  </section>
+
+  <!-- game -->
+  <section class="player-card hidden" id="gameView">
+    <div class="my-score">
+      <div>
+        <div class="stat-lbl">我的分數</div>
+        <div class="v" id="myScore">0</div>
+      </div>
+      <div style="text-align:right">
+        <div class="stat-lbl">答對</div>
+        <div class="v" id="myCorrect" style="font-size:16px">0</div>
+      </div>
+    </div>
+
+    <div id="waitView" class="waiting">
+      <div class="spin"></div>
+      <div id="waitText">等待主持人開始…</div>
+    </div>
+
+    <div id="questionView" class="hidden">
+      <div class="pmeta">
+        <span>第 <b id="qNo">1</b> / <b id="qTotal">1</b> 題</span>
+        <b id="pTimer">0s</b>
+      </div>
+      <div class="timerbar" id="pBar"><i id="pFill"></i></div>
+      <p class="pq" id="pText"></p>
+      <img class="qimage hidden" id="pImage" alt="題目圖片">
+      <div class="answers" id="answers"></div>
+    </div>
+
+    <div id="answerView" class="hidden">
+      <div class="feedback wait">
+        <div class="big" id="ansBig">已收到答案</div>
+        <div class="sub" id="ansSub">等其他人作答…</div>
+      </div>
+    </div>
+
+    <div id="resultView" class="hidden">
+      <div class="feedback good" id="fbBox">
+        <div class="big" id="fbBig">答對了！</div>
+        <div class="sub" id="fbSub"></div>
+        <div class="gain" id="fbGain"></div>
+      </div>
+    </div>
+
+    <div id="endView" class="hidden">
+      <div class="feedback wait">
+        <div class="big" id="endBig">遊戲結束</div>
+        <div class="sub" id="endSub"></div>
+      </div>
+      <div class="board" id="pBoard" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <p class="footer">保持此頁開啟 · 斷線會自動重連</p>
+</div>
+
+<script src="assets/vendor/mqtt.min.js"></script>
+<script src="assets/core.js"></script>
+<script src="assets/net.js"></script>
+<script src="assets/play.js"></script>
+</body>
+</html>

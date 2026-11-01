@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuizClash · 主持與出題</title>
+<meta name="description" content="建立四選一題目、開房間、投影 QR code 與即時排行榜。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%238b5cf6'/%3E%3Cpath d='M11 10l11 6-11 6z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="mark">▶</span>QuizClash <small id="modeTag">出題</small></a>
+    <div class="tools">
+      <span class="status" id="status"><i></i><em>未連線</em></span>
+      <button class="btn small" type="button" id="btnFull">全螢幕</button>
+      <button class="btn small ghost" type="button" id="btnBack">返回</button>
+    </div>
+  </header>
+
+  <!-- ================= EDITOR ================= -->
+  <section id="viewEditor">
+    <div class="card">
+      <h2>題目設定</h2>
+      <label class="field">
+        <span>遊戲名稱（可留空）</span>
+        <input type="text" id="quizTitle" maxlength="80" placeholder="例如：中三數學 · 因式分解熱身">
+      </label>
+
+      <details class="card" style="background:rgba(255,255,255,.045);margin-top:6px">
+        <summary style="cursor:pointer;font-weight:700;font-size:14px">CSV 匯入 / 匯出</summary>
+        <p class="hint">
+          欄位順序：<code>題目, 選項A, 選項B, 選項C, 選項D, 正確答案, 時限秒, 圖片URL</code>。
+          正確答案可填 <code>A–D</code>、<code>1–4</code> 或完整選項文字；圖片可留空。
+        </p>
+        <div class="row" style="margin-top:10px">
+          <input type="file" id="csvFile" accept=".csv,text/csv" style="flex:1 1 220px;padding:9px;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:11px;font-size:13px">
+          <button class="btn small" type="button" id="btnExportQuiz">匯出目前題目</button>
+        </div>
+        <label class="field">
+          <span>或直接貼上 CSV 內容</span>
+          <textarea id="csvText" rows="5" placeholder="題目,選項A,選項B,選項C,選項D,正確答案,時限秒,圖片URL&#10;2x+4 的因式分解是？,2(x+2),2(x+4),x(2+4),2x(x+2),A,20,"></textarea>
+        </label>
+        <button class="btn small" type="button" id="btnImportText">匯入貼上的內容</button>
+      </details>
+
+      <div id="errors"></div>
+    </div>
+
+    <div id="qlist" style="margin-top:14px"></div>
+
+    <div class="row" style="margin-top:12px">
+      <button class="btn" type="button" id="btnAdd" style="flex:1 1 200px">＋ 新增一條題目</button>
+      <button class="btn ghost" type="button" id="btnDemo">載入示範題目</button>
+    </div>
+
+    <div class="sticky-actions">
+      <button class="btn" type="button" id="btnSave">儲存到題庫</button>
+      <button class="btn primary" type="button" id="btnStart" style="flex:2 1 220px">開始遊戲 →</button>
+    </div>
+    <p class="hint">題目會保存在這部裝置的瀏覽器（localStorage），清除瀏覽資料會一併清除，重要題庫請匯出 CSV 備份。</p>
+  </section>
+
+  <!-- ================= LIVE ================= -->
+  <section id="viewLive" class="hidden">
+    <div class="live">
+      <aside class="side">
+        <div class="card" style="padding:12px">
+          <div class="qrbox"><svg id="qr" xmlns="http://www.w3.org/2000/svg"></svg></div>
+          <p class="join-url" id="joinUrl">—</p>
+          <div class="code-box">
+            <span>房間碼</span>
+            <strong id="codeText">------</strong>
+          </div>
+          <button class="btn small wide" type="button" id="btnCopyLink" style="margin-top:8px">複製加入連結</button>
+        </div>
+        <div class="card" style="padding:14px">
+          <div class="stat-num" id="playerCount">0</div>
+          <div class="stat-lbl">已加入玩家</div>
+          <div class="stat-num" id="answeredCount" style="margin-top:12px">0</div>
+          <div class="stat-lbl">本題已作答</div>
+        </div>
+        <div class="card" style="padding:12px">
+          <button class="btn small wide" type="button" id="btnExportResults">匯出成績 CSV</button>
+          <button class="btn small wide warn" type="button" id="btnRestart" style="margin-top:8px">重新開始（清除分數）</button>
+        </div>
+      </aside>
+
+      <main class="stage-card">
+        <div class="stage-head">
+          <h2 id="phaseLabel">等待玩家</h2>
+          <span class="pill" id="progressPill">0 / 0</span>
+          <span style="flex:1"></span>
+          <button class="btn small ghost" type="button" id="btnSort">排名：最高分</button>
+        </div>
+
+        <!-- lobby -->
+        <div id="lobbyView">
+          <p class="qtext">用手機掃描左邊 QR code<br>或到 <b id="lobbyUrl">—</b> 輸入房間碼</p>
+          <p class="hint">玩家加入後名字會出現在這裡。準備好就按「開始第一題」，倒數會同步開始。</p>
+          <div class="chips" id="chips"></div>
+          <div class="host-controls">
+            <button class="btn primary" type="button" id="btnBegin">開始第一題 →</button>
+          </div>
+        </div>
+
+        <!-- question -->
+        <div id="qView" class="hidden">
+          <p class="qtext" id="qText"></p>
+          <img class="qimage hidden" id="qImage" alt="題目圖片">
+          <div class="timerbar" id="timerBar"><i id="timerFill"></i></div>
+          <div class="timer-row"><span>剩餘時間</span><b id="timerSec">0s</b></div>
+          <div class="tiles" id="tiles"></div>
+          <div class="host-controls">
+            <button class="btn primary" type="button" id="btnReveal">提早結束並看答案</button>
+          </div>
+        </div>
+
+        <!-- reveal -->
+        <div id="revealView" class="hidden">
+          <p class="qtext" id="qTextReveal"></p>
+          <div class="tiles" id="tilesReveal"></div>
+          <div class="counts" id="counts"></div>
+          <div class="board" id="miniBoard" style="margin-top:16px"></div>
+          <div class="host-controls">
+            <button class="btn primary" type="button" id="btnNext">下一題 →</button>
+          </div>
+        </div>
+
+        <!-- board / end -->
+        <div id="endView" class="hidden">
+          <div class="podium" id="podium"></div>
+          <div class="board" id="board"></div>
+          <div class="host-controls">
+            <button class="btn primary" type="button" id="btnPlayAgain">再玩一次</button>
+            <button class="btn" type="button" id="btnEditBack">修改題目</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <p class="footer">主持畫面請保持開啟 · <a href="index.html">首頁</a></p>
+</div>
+
+<script src="assets/vendor/mqtt.min.js"></script>
+<script src="assets/vendor/qrcode.js"></script>
+<script src="assets/core.js"></script>
+<script src="assets/net.js"></script>
+<script src="assets/host.js"></script>
+</body>
+</html>

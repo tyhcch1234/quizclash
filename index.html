@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuizClash · 即時問答比賽</title>
+<meta name="description" content="像 Kahoot 的即時問答遊戲：老師建立四選一題目，學生掃 QR code 用手機加入，即時計分、排行榜決勝。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%238b5cf6'/%3E%3Cpath d='M11 10l11 6-11 6z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="mark">▶</span>QuizClash <small>即時問答比賽</small></a>
+    <div class="tools">
+      <a class="btn small ghost" href="https://github.com/tyhcch1234/quizclash" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn small" href="host.html">建立題目</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>四選一搶答，<span>即時計分</span>，即刻見高低。</h1>
+    <p>老師建立題目 → 投影房間碼與 QR code → 學生手機加入搶答 → 大螢幕即時顯示誰答對、誰最快、誰最高分。免安裝、免帳號、免後端。</p>
+  </section>
+
+  <div class="home-grid">
+    <div class="card">
+      <h2>建立新遊戲</h2>
+      <p class="hint">四選一題目、每題時限、圖片題、CSV 匯入匯出。建立後會得到 6 位房間碼。</p>
+      <a class="btn primary big" href="host.html" style="margin-top:14px">＋ 建立題目並開房間</a>
+
+      <h2 style="margin-top:22px">我的題庫</h2>
+      <div class="quiz-list" id="quizList"></div>
+
+      <ul class="feature-list">
+        <li><span class="ico">⏱</span><span><b>速度計分</b>　答對 600 分，最快可再加 400 分，連對另有加成。</span></li>
+        <li><span class="ico">🏆</span><span><b>雙榜排名</b>　可切換「最高分」或「答對最多」，完場即出三甲。</span></li>
+        <li><span class="ico">🖼</span><span><b>圖片題</b>　上傳圖片自動壓縮，適合數學圖形、圖表、相片題。</span></li>
+        <li><span class="ico">📄</span><span><b>CSV 匯入</b>　整份題庫一次過貼上，或匯出備份與交換。</span></li>
+      </ul>
+    </div>
+
+    <div class="card join-card">
+      <h2>加入遊戲</h2>
+      <p class="hint">輸入大螢幕上顯示的 6 位房間碼。</p>
+      <form id="joinForm" autocomplete="off">
+        <input class="code-input" id="code" inputmode="text" maxlength="8" placeholder="ABC123" aria-label="房間碼" spellcheck="false">
+        <button class="btn primary big" type="submit">進入遊戲</button>
+      </form>
+      <p class="hint" id="joinHint">提示：用手機掃描投影畫面上的 QR code 會自動填好房間碼。</p>
+      <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--line)">
+        <p class="hint">主持畫面需要保持開啟。連線走公共 MQTT broker，適合課堂即時使用；請勿傳送敏感資料。</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer">QuizClash · 純靜態網頁，可放在 GitHub Pages</p>
+</div>
+
+<script src="assets/net.js"></script>
+<script src="assets/home.js"></script>
+</body>
+</html>
