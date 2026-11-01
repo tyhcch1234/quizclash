@@ -348,13 +348,18 @@
 
   function publishQuestion(q, index) {
     if (!client || !client.connected) return;
-    const payload = JSON.stringify({
+    let payload = JSON.stringify({
       i: index,
       text: q.text,
       image: q.image || '',
       options: q.options,
       limit: q.limit,
     });
+    if (payload.length > 900000) {
+      // stay below the broker's packet limit instead of silently dropping the whole question
+      Net.toast('題目圖片過大，這一題只會傳送文字');
+      payload = JSON.stringify({ i: index, text: q.text, image: '', options: q.options, limit: q.limit });
+    }
     client.publish(topics().q, payload, { qos: 1, retain: true });
   }
 

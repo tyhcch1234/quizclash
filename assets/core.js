@@ -10,7 +10,7 @@
   const TOPIC_PREFIX = 'quizclash/v1';
   const MAX_QUESTIONS = 100;
   const DEFAULT_LIMIT = 20;
-  const MAX_IMAGE_CHARS = 900000; // ~650KB base64
+  const MAX_IMAGE_CHARS = 600000; // ~450KB base64, under the broker's 1MB packet limit
 
   /* ---------- primitives ---------- */
 
